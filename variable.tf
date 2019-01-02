@@ -5,5 +5,5 @@ variable "vpc-id" {
 }
 variable "subnet-id" {
 }
-variable "my-ip" {
+variable "admin-cidr" {
 }
