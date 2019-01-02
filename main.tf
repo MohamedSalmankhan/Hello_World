@@ -1,32 +1,6 @@
 provider "aws" {
   region = "us-east-1"
 }
-resource "aws_security_group" "SG_EC2" {
-  vpc_id = "${var.vpc-id}"
-
-  ingress {
-    description = "ssh port"
-    from_port = 22
-    to_port = 22
-    protocol = "tcp"
-    cidr_blocks = ["${var.my-ip}"]
-  }
-  ingress {
-    from_port = 80
-    protocol = "tcp"
-    to_port = 80
-    cidr_blocks = ["${var.my-ip}"]
-  }
-  egress {
-    from_port = 0
-    to_port = 0
-    protocol = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  tags {
-    Name = "terra_ec2_sg"
-  }
-}
 
 resource "aws_security_group" "SG_ELB" {
   vpc_id = "${var.vpc-id}"
@@ -35,7 +9,7 @@ resource "aws_security_group" "SG_ELB" {
     from_port = 80
     protocol = "tcp"
     to_port = 80
-    cidr_blocks = ["${var.my-ip}"]
+    cidr_blocks = ["0.0.0.0/0"]
   }
   egress {
     from_port = 0
@@ -47,15 +21,30 @@ resource "aws_security_group" "SG_ELB" {
     Name = "terra_elb_sg"
   }
 }
+resource "aws_security_group" "SG_EC2" {
+  vpc_id = "${var.vpc-id}"
 
-resource "aws_instance" "EC2_instance" {
-  ami = "${var.instance-ami}"
-  instance_type = "t2.micro"
-  subnet_id = "${var.subnet-id}"
-  vpc_security_group_ids = ["${aws_security_group.SG_EC2.id}"]
-  user_data = "${file("userdata.sh")}"
+  ingress {
+    description = "ssh port"
+    from_port = 22
+    to_port = 22
+    protocol = "tcp"
+    cidr_blocks = ["${var.admin-cidr}"]
+  }
+  ingress {
+    from_port = 80
+    protocol = "tcp"
+    to_port = 80
+    cidr_blocks = ["${aws_security_group.SG_ELB.id}"]
+  }
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
   tags {
-    Name = "terra_EC2_ins"
+    Name = "terra_ec2_sg"
   }
 }
 
@@ -80,5 +69,15 @@ resource "aws_elb" "ELB" {
   }
   tags {
     Name = "terra_elb"
+  }
+}
+resource "aws_instance" "EC2_instance" {
+  ami = "${var.instance-ami}"
+  instance_type = "t2.micro"
+  subnet_id = "${var.subnet-id}"
+  vpc_security_group_ids = ["${aws_security_group.SG_EC2.id}"]
+  user_data = "${file("userdata.sh")}"
+  tags {
+    Name = "terra_EC2_ins"
   }
 }
