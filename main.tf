@@ -35,7 +35,7 @@ resource "aws_security_group" "SG_EC2" {
     from_port = 80
     protocol = "tcp"
     to_port = 80
-    cidr_blocks = ["${aws_security_group.SG_ELB.id}"]
+    security_groups = ["${aws_security_group.SG_ELB.id}"]
   }
   egress {
     from_port = 0
