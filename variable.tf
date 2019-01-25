@@ -8,4 +8,5 @@ variable "subnet-id" {
   default = "subnet-0cbc1c31"
 }
 variable "admin-cidr" {
+  default = "0.0.0.0/0"
 }
