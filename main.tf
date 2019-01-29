@@ -1,6 +1,7 @@
 provider "aws" {
   region = "us-east-1"
 }
+export TF_ADMIN_CIDR = "${var.admin_cidr}"
 
 resource "aws_security_group" "SG_ELB" {
   vpc_id = "${var.vpc-id}"
