@@ -3,7 +3,7 @@ provider "aws" {
 }
 
 resource "aws_security_group" "SG_ELB" {
-  vpc_id = "${var.vpc-id}"
+  vpc_id = "${var.vpc_id}"
 
   ingress {
     from_port = 80
@@ -22,7 +22,7 @@ resource "aws_security_group" "SG_ELB" {
   }
 }
 resource "aws_security_group" "SG_EC2" {
-  vpc_id = "${var.vpc-id}"
+  vpc_id = "${var.vpc_id}"
 
   ingress {
     description = "ssh port"
@@ -49,7 +49,7 @@ resource "aws_security_group" "SG_EC2" {
 }
 
 resource "aws_elb" "ELB" {
-  subnets         = ["${var.subnet-id}"]
+  subnets         = ["${var.subnet_id}"]
   security_groups = ["${aws_security_group.SG_ELB.id}"]
   instances = ["${aws_instance.EC2_instance.id}"]
 
@@ -72,9 +72,9 @@ resource "aws_elb" "ELB" {
   }
 }
 resource "aws_instance" "EC2_instance" {
-  ami = "${var.instance-ami}"
+  ami = "${var.instance_ami}"
   instance_type = "t2.micro"
-  subnet_id = "${var.subnet-id}"
+  subnet_id = "${var.subnet_id}"
   vpc_security_group_ids = ["${aws_security_group.SG_EC2.id}"]
   user_data = "${file("userdata.sh")}"
   tags {
